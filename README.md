@@ -308,7 +308,7 @@ See the `LICENSE` file for details.
 
 ## 🙌 Author
 
-Developed by **Amir**  
+Developed by **AmirY**  
 Contributions and improvements are welcome!
 
 

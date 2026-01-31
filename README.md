@@ -38,7 +38,7 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
 ## 🧰 Hardware
 
 - ESP8266 module (ESP-12F recommended)
-- GPS module (NEO-6M or compatible, UART)
+- GPS module (NEO-6M,GP-02 or compatible, UART)
 - 0.96" OLED SSD1306 (I2C)
 - External SPI Flash (Winbond W25Qxx series)
 - 2 push buttons:

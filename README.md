@@ -6,7 +6,6 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
 
 ---
 
-## 📸 Photos
 
 ![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/ON.jpg)
 
@@ -96,6 +95,8 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
 7. Open in browser:
    - `http://192.168.4.1`
 8. Download files / delete single file / erase META index / exit AP mode
+
+![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/web.png)
 
 ---
 

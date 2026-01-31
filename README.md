@@ -8,7 +8,7 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
 
 ## 📸 Photos
 
-[> Upload your images into a folder like `docs/` and replace the filenames below.](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/7b460dedf2e76cc959fca06bbfab3436a9e6bcfa/docs/1.jpg)
+[docs/1.jpg](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/1.jpg)
 
 
 ---

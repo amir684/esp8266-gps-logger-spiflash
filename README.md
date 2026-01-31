@@ -8,7 +8,7 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
 
 ## 📸 Photos
 
-![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/1.jpg)
+![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/ON.jpg)
 
 
 ---

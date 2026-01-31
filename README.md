@@ -98,8 +98,6 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
    - `http://192.168.4.1`
 8. Download files / delete single file / erase META index / exit AP mode
 
-![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/web.png)
-
 ---
 
 ## ⚙️ Configuration (User Settings in Code)
@@ -227,4 +225,90 @@ When `dataWriteAddr >= DATA_END`:
 ## 📄 Log Format (GPS Visualizer compatible)
 
 Each log file begins with a required header row:
+
+latitude,longitude,elevation,time,speed_kmh
+
+
+Upload directly to **GPS Visualizer**:
+- https://www.gpsvisualizer.com/
+
+---
+
+![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/web.png)
+
+## 🌐 Web UI (Download / Delete / Erase)
+
+When AP mode is enabled, the web interface provides:
+
+### Download
+- Reads the file data directly from DATA region using the saved `startAddr` and `size`.
+- Streams it to the browser with correct headers:
+  - `Content-Disposition: attachment; filename=...`
+  - `Content-Length: ...`
+- Uses chunked reads (e.g., 256 bytes) for stability.
+
+### Delete single file
+- Does not rewrite old META entries (which is unsafe and slow).
+- Writes a `REC_DEL` record to META (tombstone).
+- On next index rebuild, the file is removed from the list.
+
+### Erase ALL (fast)
+- Only erases META area (64KB).
+- DATA is not fully erased (too slow), instead it is erased *on-demand* when new logs are written from the start.
+- This is why it feels instant compared to erasing the entire flash.
+
+### Exit AP without reset
+- AP button can toggle AP off and return to logger mode without reboot.
+
+---
+
+## 🟡 UI States (OLED)
+
+- `IDLE` – not logging
+- `WAIT` – user requested logging but GPS time isn’t valid yet
+- `LOG` – logging active (can blink to show activity)
+- `AP:ON/OFF` – current WiFi mode
+- `MEM:%` – free percent of DATA area (approx, based on current write pointer)
+
+---
+
+## 📦 Supported SPI Flash Chips
+
+Works with most standard SPI NOR flashes (not only Winbond),
+as long as they support:
+- READ (0x03)
+- WREN (0x06)
+- RDSR (0x05)
+- Page Program (0x02)
+- Sector Erase 4KB (0x20)
+
+Examples:
+- Winbond W25Q32 / W25Q64 / W25Q128 / W25Q256
+- Many compatible equivalents
+
+---
+
+## ✅ Tips for Stability
+
+- Use a stable 3.3V regulator:
+  - HT7333 is power-efficient for battery use
+  - add proper decoupling near ESP8266 and flash
+- Keep SPI wires short
+- Add capacitors on 3.3V rail (helps with WiFi peaks)
+- For GPS: ensure correct UART baud rate
+
+---
+
+## 📜 License
+
+This project is licensed under the **Apache License 2.0**.  
+See the `LICENSE` file for details.
+
+---
+
+## 🙌 Author
+
+Developed by **Amir**  
+Contributions and improvements are welcome!
+
 

@@ -1,21 +1,19 @@
-# ESP8266 GPS Logger with SPI Flash
+# ESP8266 GPS Logger with SPI Flash (TXT + KML Export)
 
 Portable and robust GPS logger based on **ESP8266**, featuring an **external SPI Flash memory**, **OLED display**, and a **WiFi web interface** for downloading logs.
 
-Designed for battery-powered operation, with power-loss-safe logging and full compatibility with **GPS Visualizer**.
+Designed for battery-powered operation, with power-loss-safe logging and compatibility with **GPS Visualizer** — plus **direct KML export** with **speed-colored tracks** and **Start/End markers** (Google Earth ready).
 
 ---
 
-
 ![image alt](https://github.com/amir684/esp8266-gps-logger-spiflash/blob/main/docs/ON.jpg)
-
 
 ---
 
 ## ✨ Features
 
 - 📍 Logs GPS position **once per second**
-- 💾 External SPI Flash (W25Q32 / W25Q64 / W25Q128)
+- 💾 External SPI Flash (W25Q32 / W25Q64 / W25Q128 / W25Q256)
 - 🛡️ Power-loss safe logging (metadata journal + append-only data)
 - 🖥️ 0.96" OLED live display:
   - Fix status (OK/NO)
@@ -26,19 +24,28 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
   - Free memory percentage
   - Mode indicators (LOG/IDLE/WAIT + AP ON/OFF)
 - 📶 WiFi **Access Point mode** with built-in web interface
-- 🌐 Download logs directly from browser
+- 🌐 Download logs directly from browser:
+  - **TXT/CSV** (GPS Visualizer compatible)
+  - **KML** (speed-colored track + **Start/End** markers)
 - 🗂️ Multiple log files, timestamped by GPS time
 - 🧹 Delete individual files (tombstone delete)
 - ⚡ Fast "Erase ALL" (resets META index quickly)
-- 📄 TXT format compatible with **gpsvisualizer.com**
 - 🔋 Optimized for low power usage
+
+### 🆕 KML Export (Speed Colors)
+The device **stores only TXT/CSV** in flash, and generates **KML on demand** when you download it:
+- No extra KML storage needed
+- Track is exported as many short line segments
+- Each segment is colored by speed (low → red, high → magenta)
+- Includes **Start** and **End** placemarks
+- Opens nicely in **Google Earth**
 
 ---
 
 ## 🧰 Hardware
 
 - ESP8266 module (ESP-12F recommended)
-- GPS module (NEO-6M,GP-02 or compatible, UART)
+- GPS module (NEO-6M, GP-02 or compatible, UART)
 - 0.96" OLED SSD1306 (I2C)
 - External SPI Flash (Winbond W25Qxx series)
 - 2 push buttons:
@@ -96,7 +103,9 @@ Designed for battery-powered operation, with power-loss-safe logging and full co
    - Password: `12345678`
 7. Open in browser:
    - `http://192.168.4.1`
-8. Download files / delete single file / erase META index / exit AP mode
+8. Download files:
+   - **TXT** → upload to GPS Visualizer if you want
+   - **KML** → open directly in Google Earth (colored by speed + Start/End)
 
 ---
 
@@ -226,8 +235,9 @@ When `dataWriteAddr >= DATA_END`:
 
 Each log file begins with a required header row:
 
+```
 latitude,longitude,elevation,time,speed_kmh
-
+```
 
 Upload directly to **GPS Visualizer**:
 - https://www.gpsvisualizer.com/
@@ -240,15 +250,19 @@ Upload directly to **GPS Visualizer**:
 
 When AP mode is enabled, the web interface provides:
 
-### Download
-- Reads the file data directly from DATA region using the saved `startAddr` and `size`.
-- Streams it to the browser with correct headers:
-  - `Content-Disposition: attachment; filename=...`
-  - `Content-Length: ...`
-- Uses chunked reads (e.g., 256 bytes) for stability.
+### Download TXT
+- Streams the TXT/CSV file from DATA region using the saved `startAddr` and `size`.
+
+### Download KML (Speed Colors)
+- Reads the existing TXT/CSV file from flash
+- Computes max speed (vmax) and generates:
+  - A speed legend
+  - Colored track segments
+  - Start/End markers
+- Streams the KML to the browser (no extra flash usage)
 
 ### Delete single file
-- Does not rewrite old META entries (which is unsafe and slow).
+- Does not rewrite old META entries (unsafe and slow).
 - Writes a `REC_DEL` record to META (tombstone).
 - On next index rebuild, the file is removed from the list.
 
@@ -266,9 +280,10 @@ When AP mode is enabled, the web interface provides:
 
 - `IDLE` – not logging
 - `WAIT` – user requested logging but GPS time isn’t valid yet
-- `LOG` – logging active (can blink to show activity)
+- `LOG` – logging active
 - `AP:ON/OFF` – current WiFi mode
 - `MEM:%` – free percent of DATA area (approx, based on current write pointer)
+- `FULL` – flash data region reached end (no more logging until META reset)
 
 ---
 
@@ -310,5 +325,3 @@ See the `LICENSE` file for details.
 
 Developed by **AmirY**  
 Contributions and improvements are welcome!
-
-

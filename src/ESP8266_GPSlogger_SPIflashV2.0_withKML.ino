@@ -917,12 +917,22 @@ void startAPServer() {
     readLineFromFlash(addr, endAddr, line, sizeof(line));
 
     int vmax = 0;
+    unsigned long lastYield = millis();
+    int pointCount = 0;
     while (addr < endAddr) {
       if (!readLineFromFlash(addr, endAddr, line, sizeof(line))) break;
       float lat, lon; int alt, spd;
       if (!parseCsvLine(line, lat, lon, alt, spd)) continue;
       if (spd > vmax) vmax = spd;
-      delay(0);
+
+      // Aggressive watchdog feeding: every 50 points OR every 1 second
+      pointCount++;
+      if (pointCount >= 50 || (millis() - lastYield) >= 1000) {
+        ESP.wdtFeed();
+        yield();
+        lastYield = millis();
+        pointCount = 0;
+      }
     }
     if (vmax < 1) vmax = 1;
 
@@ -973,6 +983,9 @@ void startAPServer() {
     float startLat = 0, startLon = 0; int startAlt = 0;
     float endLat = 0, endLon = 0; int endAlt = 0;
 
+    lastYield = millis();
+    pointCount = 0;
+
     while (addr < endAddr) {
       if (!readLineFromFlash(addr, endAddr, line, sizeof(line))) break;
 
@@ -1011,7 +1024,15 @@ void startAPServer() {
       client.print("        </Placemark>\n");
 
       prevLat = lat; prevLon = lon; prevAlt = alt; prevSpd = spd;
-      delay(0);
+
+      // Aggressive watchdog feeding: every 50 points OR every 1 second
+      pointCount++;
+      if (pointCount >= 50 || (millis() - lastYield) >= 1000) {
+        ESP.wdtFeed();
+        yield();
+        lastYield = millis();
+        pointCount = 0;
+      }
     }
 
     // Start/End markers
